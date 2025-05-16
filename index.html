@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snekkk the Game</title> <!-- Changed the title -->
-    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/3544/3544103.png" type="image/png"> <!-- Set favicon -->
+    <title>Snekkk the Game</title>
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/3544/3544103.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -43,7 +43,7 @@
 
         #score.glow {
             text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00;
-            color: #ffff00; /* Yellow glow */
+            color: #ffff00;
         }
 
         #gameOver {
@@ -87,7 +87,6 @@
             background-color: #ddd;
         }
 
-        /* Pause Menu */
         #pauseMenu {
             display: none;
             position: absolute;
@@ -116,7 +115,6 @@
             font-family: 'Press Start 2P', cursive;
         }
 
-        /* Settings Menu */
         #settingsMenu {
             display: none;
             position: absolute;
@@ -138,7 +136,6 @@
             margin: 10px;
         }
 
-        /* Instruction Text (Esc instruction at the bottom) */
         #instructionText {
             position: fixed;
             bottom: 20px;
@@ -148,7 +145,6 @@
             width: 100%;
         }
 
-        /* Go Back Button */
         #goBackButton {
             position: absolute;
             top: 20px;
@@ -222,20 +218,21 @@
         let snake, food, dx, dy, score, gameLoop, gameSpeed;
         let isPaused = false;
 
-        // Resize the canvas dynamically
         function resizeCanvas() {
             canvas.width = window.innerWidth * 0.8;
             canvas.height = window.innerHeight * 0.8;
+
+            // Ensure height is divisible by grid size
+            canvas.height = Math.floor(canvas.height / gridSize) * gridSize;
+            tileCountX = Math.floor(canvas.width / gridSize);
+            tileCountY = Math.floor(canvas.height / gridSize);
         }
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Initialize the game with the selected speed
         function initGame() {
-            gameSpeed = 100; // Default speed (1x)
-            tileCountX = Math.floor(canvas.width / gridSize);
-            tileCountY = Math.floor(canvas.height / gridSize);
+            gameSpeed = 100;
             snake = [{ x: Math.floor(tileCountX / 2), y: Math.floor(tileCountY / 2) }];
             food = { x: Math.floor(tileCountX * 0.75), y: Math.floor(tileCountY * 0.75) };
             dx = 0;
@@ -246,15 +243,13 @@
             pauseMenu.style.display = 'none';
             settingsMenu.style.display = 'none';
             gameLoop = setInterval(drawGame, gameSpeed);
-            gameSpeedSelect.value = '1';  // Set the dropdown to '1x' initially
         }
 
-        // Handle keyboard input
         document.addEventListener('keydown', handleKeyPress);
         function handleKeyPress(e) {
             if (isPaused) {
                 if (e.key === 'Escape') {
-                    resumeGame(); // Continue the game when Escape is pressed in the pause menu
+                    resumeGame();
                 }
                 return;
             }
@@ -264,7 +259,7 @@
                 case 'ArrowDown': if (dy === 0) { dx = 0; dy = 1; } break;
                 case 'ArrowLeft': if (dx === 0) { dx = -1; dy = 0; } break;
                 case 'ArrowRight': if (dx === 0) { dx = 1; dy = 0; } break;
-                case 'Escape': // Pause
+                case 'Escape': 
                     if (!isPaused) {
                         clearInterval(gameLoop);
                         pauseMenu.style.display = 'flex';
@@ -274,94 +269,81 @@
             }
         }
 
-        // Main game drawing loop
         function drawGame() {
-            tileCountX = Math.floor(canvas.width / gridSize);
-            tileCountY = Math.floor(canvas.height / gridSize);
-
-            // Clear canvas
             ctx.fillStyle = '#1e1e1e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Move snake
             let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Wrap snake around if it hits boundaries
             if (head.x < 0) head.x = tileCountX - 1;
             if (head.x >= tileCountX) head.x = 0;
             if (head.y < 0) head.y = tileCountY - 1;
             if (head.y >= tileCountY) head.y = 0;
             snake.unshift(head);
 
-            // Check if snake eats food
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 scoreDisplay.textContent = `Score: ${score}`;
+                if (score % 50 === 0) {
+                    scoreDisplay.classList.add('glow');
+                } else {
+                    scoreDisplay.classList.remove('glow');
+                }
                 generateFood();
             } else {
-                snake.pop(); // Remove last tail segment
+                snake.pop();
             }
 
-            // Draw snake
-            ctx.fillStyle = '#ffff00'; // Yellow snake
+            ctx.fillStyle = '#ffff00';
             snake.forEach(segment => {
                 ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
             });
 
-            // Draw food
             ctx.fillStyle = 'red';
             ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
 
-            // Check if snake collides with itself
             if (snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
                 endGame();
             }
         }
 
-        // Generate random food
         function generateFood() {
             food.x = Math.floor(Math.random() * tileCountX);
             food.y = Math.floor(Math.random() * tileCountY);
         }
 
-        // End the game
         function endGame() {
             clearInterval(gameLoop);
             finalScoreDisplay.textContent = score;
-            gameOverScreen.style.display = 'flex'; // Show game over screen
+            gameOverScreen.style.display = 'flex';
         }
 
-        // Restart the game
         function restartGame() {
             initGame();
         }
 
-        // Resume the game
         function resumeGame() {
             pauseMenu.style.display = 'none';
             isPaused = false;
             gameLoop = setInterval(drawGame, gameSpeed);
         }
 
-        // Open settings menu
         function openSettings() {
+            clearInterval(gameLoop);
             pauseMenu.style.display = 'none';
             settingsMenu.style.display = 'flex';
         }
 
-        // Save settings and apply the selected speed
         function saveSettings() {
             gameSpeed = 100 / parseInt(gameSpeedSelect.value);
-            settingsMenu.style.display = 'none'; // Close settings menu
-            resumeGame(); // Restart the game immediately with new speed
+            settingsMenu.style.display = 'none';
+            resumeGame();
         }
 
-        // Go Back Button
         function goBack() {
             window.location.href = "https://aztozmine.github.io/Snekkk/";
         }
 
-        // Start the game
         initGame();
     </script>
 </body>
