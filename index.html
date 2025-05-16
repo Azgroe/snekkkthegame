@@ -3,191 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ouroboros</title>
-    <!-- Favicon for the tab -->
-    <link rel="icon" type="image/png" href="https://cdn.pixabay.com/photo/2021/05/28/20/11/ouroboros-6291969_1280.png">
+    <title>Snekkk the Game</title> <!-- Changed the title -->
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/3544/3544103.png" type="image/png"> <!-- Set favicon -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        body {
+        html, body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #2b2a33;
-            color: #fff;
+            width: 100%;
             height: 100vh;
-            width: 100vw;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding-top: 50px;
-        }
-
-        .center-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .date {
-            font-size: 36px;
-            color: #ddd;
-            margin-bottom: 20px;
-        }
-
-        .search-bar {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            padding: 10px 20px;
-            display: inline-flex;
-            align-items: center;
-            width: 70vw;
-            max-width: 800px;
-        }
-
-        .search-bar input {
-            background: none;
-            border: none;
-            outline: none;
-            color: #fff;
-            font-size: 18px;
-            flex: 1;
-            text-align: center;
-        }
-
-        .search-bar input::placeholder {
-            color: #ddd;
-            text-align: center;
-        }
-
-        .middle-wrapper {
-            flex: 1;
+            background-color: #2b2a33;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            margin-top: 60px;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #gameCanvas {
+            width: 80vw;
+            height: 80vh;
+            max-width: 1200px;
+            max-height: 800px;
+            border: 2px solid #333;
+            background-color: #1e1e1e;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 20px;
+            color: white;
+            text-shadow: 1px 1px 2px #000;
+            font-family: 'Press Start 2P', cursive;
+            transition: text-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        #score.glow {
+            text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00;
+            color: #ffff00; /* Yellow glow */
+        }
+
+        #gameOver {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #gameOver h2 {
+            font-size: 24px;
+        }
+
+        #gameOver p {
+            font-size: 18px;
+        }
+
+        #gameOver button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+            animation: pulsate 1.5s infinite ease-in-out;
+        }
+
+        #gameOver button:hover {
+            background-color: #ddd;
+        }
+
+        /* Pause Menu */
+        #pauseMenu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #pauseMenu button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* Settings Menu */
+        #settingsMenu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #settingsMenu select, #settingsMenu button {
+            margin: 10px;
+        }
+
+        /* Instruction Text (Esc instruction at the bottom) */
+        #instructionText {
+            position: fixed;
+            bottom: 20px;
+            color: white;
+            font-size: 14px;
+            text-align: center;
             width: 100%;
         }
 
-        .middle-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .time {
-            font-size: 96px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #fff;
-            text-align: center;
-        }
-
-        .greeting {
-            font-size: 24px;
-            color: #ddd;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            justify-items: center;
-        }
-
-        .button {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Go Back Button */
+        #goBackButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #ff4c4c;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s, box-shadow 0.3s;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
         }
 
-        .button:hover {
-            background: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+        #goBackButton:hover {
+            background-color: #ff1a1a;
         }
 
-        .button img {
-            width: 60px;
-            height: 60px;
+        @keyframes pulsate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
-    <div class="center-section">
-        <div class="date" id="date">Friday, May 16, 2025</div>
-        <form class="search-bar" action="https://www.google.com/search" method="GET">
-            <input type="text" name="q" placeholder="O Ouroboros, eternal serpent, rise from the cycle of infinity to guide my path!">
-        </form>
+
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameOver">
+        <h2>Game Over!</h2>
+        <p>Your Score: <span id="finalScore">0</span></p>
+        <button onclick="restartGame()">Restart</button>
     </div>
 
-    <div class="middle-wrapper">
-        <div class="middle-section">
-            <div class="time" id="time">00:04</div>
-            <div class="greeting" id="greeting">Good night, Zor</div>
-            <div class="button-grid">
-                <a href="https://www.reddit.com" class="button">
-                    <img src="https://simpleicons.org/icons/reddit.svg" alt="Reddit" style="filter: grayscale(100%)">
-                </a>
-                <a href="https://www.youtube.com" class="button">
-                    <img src="https://simpleicons.org/icons/youtube.svg" alt="YouTube" style="filter: grayscale(100%)">
-                </a>
-                <a href="https://mail.google.com" class="button">
-                    <img src="https://simpleicons.org/icons/gmail.svg" alt="Gmail" style="filter: grayscale(100%)">
-                </a>
-                <a href="https://store.steampowered.com" class="button">
-                    <img src="https://simpleicons.org/icons/steam.svg" alt="Steam" style="filter: grayscale(100%)">
-                </a>
-                <a href="https://www.instagram.com" class="button">
-                    <img src="https://simpleicons.org/icons/instagram.svg" alt="Instagram" style="filter: grayscale(100%)">
-                </a>
-                <a href="https://x.com" class="button">
-                    <img src="https://simpleicons.org/icons/x.svg" alt="X" style="filter: grayscale(100%)">
-                </a>
-            </div>
-        </div>
+    <div id="pauseMenu">
+        <h2>Game Paused</h2>
+        <button onclick="resumeGame()">Resume</button>
+        <button onclick="openSettings()">Settings</button>
     </div>
+
+    <div id="settingsMenu">
+        <h2>Settings</h2>
+        <label for="gameSpeed">Choose Speed:</label>
+        <select id="gameSpeed">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="5">5x</option>
+            <option value="10">10x</option>
+        </select>
+        <button onclick="saveSettings()">Save Settings</button>
+    </div>
+
+    <button id="goBackButton" onclick="goBack()">Go Back</button>
+
+    <div id="instructionText">Press ESC to pause the game</div>
 
     <script>
-        function updateTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('time').textContent = `${hours}:${minutes}`;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverScreen = document.getElementById('gameOver');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const pauseMenu = document.getElementById('pauseMenu');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const gameSpeedSelect = document.getElementById('gameSpeed');
+        const instructionText = document.getElementById('instructionText');
+        const goBackButton = document.getElementById('goBackButton');
 
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const day = now.getDate();
-            const month = months[now.getMonth()];
-            const year = now.getFullYear();
-            const weekday = days[now.getDay()];
-            document.getElementById('date').textContent = `${weekday}, ${month} ${day}, ${year}`;
+        let gridSize = 20;
+        let tileCountX, tileCountY;
+        let snake, food, dx, dy, score, gameLoop, gameSpeed;
+        let isPaused = false;
 
-            const hour = now.getHours();
-            let greeting = '';
-            if (hour >= 5 && hour < 12) {
-                greeting = 'Good morning, Zor';
-            } else if (hour >= 12 && hour < 17) {
-                greeting = 'Good afternoon, Zor';
-            } else if (hour >= 17 && hour < 22) {
-                greeting = 'Good evening, Zor';
-            } else {
-                greeting = 'Good night, Zor';
-            }
-            document.getElementById('greeting').textContent = greeting;
+        // Resize the canvas dynamically
+        function resizeCanvas() {
+            canvas.width = window.innerWidth * 0.8;
+            canvas.height = window.innerHeight * 0.8;
         }
-        setInterval(updateTime, 1000);
-        updateTime();
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Initialize the game with the selected speed
+        function initGame() {
+            gameSpeed = 100; // Default speed (1x)
+            tileCountX = Math.floor(canvas.width / gridSize);
+            tileCountY = Math.floor(canvas.height / gridSize);
+            snake = [{ x: Math.floor(tileCountX / 2), y: Math.floor(tileCountY / 2) }];
+            food = { x: Math.floor(tileCountX * 0.75), y: Math.floor(tileCountY * 0.75) };
+            dx = 0;
+            dy = 0;
+            score = 0;
+            scoreDisplay.textContent = `Score: ${score}`;
+            gameOverScreen.style.display = 'none';
+            pauseMenu.style.display = 'none';
+            settingsMenu.style.display = 'none';
+            gameLoop = setInterval(drawGame, gameSpeed);
+            gameSpeedSelect.value = '1';  // Set the dropdown to '1x' initially
+        }
+
+        // Handle keyboard input
+        document.addEventListener('keydown', handleKeyPress);
+        function handleKeyPress(e) {
+            if (isPaused) {
+                if (e.key === 'Escape') {
+                    resumeGame(); // Continue the game when Escape is pressed in the pause menu
+                }
+                return;
+            }
+
+            switch (e.key) {
+                case 'ArrowUp': if (dy === 0) { dx = 0; dy = -1; } break;
+                case 'ArrowDown': if (dy === 0) { dx = 0; dy = 1; } break;
+                case 'ArrowLeft': if (dx === 0) { dx = -1; dy = 0; } break;
+                case 'ArrowRight': if (dx === 0) { dx = 1; dy = 0; } break;
+                case 'Escape': // Pause
+                    if (!isPaused) {
+                        clearInterval(gameLoop);
+                        pauseMenu.style.display = 'flex';
+                        isPaused = true;
+                    }
+                    break;
+            }
+        }
+
+        // Main game drawing loop
+        function drawGame() {
+            tileCountX = Math.floor(canvas.width / gridSize);
+            tileCountY = Math.floor(canvas.height / gridSize);
+
+            // Clear canvas
+            ctx.fillStyle = '#1e1e1e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Move snake
+            let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // Wrap snake around if it hits boundaries
+            if (head.x < 0) head.x = tileCountX - 1;
+            if (head.x >= tileCountX) head.x = 0;
+            if (head.y < 0) head.y = tileCountY - 1;
+            if (head.y >= tileCountY) head.y = 0;
+            snake.unshift(head);
+
+            // Check if snake eats food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                scoreDisplay.textContent = `Score: ${score}`;
+                generateFood();
+            } else {
+                snake.pop(); // Remove last tail segment
+            }
+
+            // Draw snake
+            ctx.fillStyle = '#ffff00'; // Yellow snake
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+            });
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+
+            // Check if snake collides with itself
+            if (snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
+                endGame();
+            }
+        }
+
+        // Generate random food
+        function generateFood() {
+            food.x = Math.floor(Math.random() * tileCountX);
+            food.y = Math.floor(Math.random() * tileCountY);
+        }
+
+        // End the game
+        function endGame() {
+            clearInterval(gameLoop);
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'flex'; // Show game over screen
+        }
+
+        // Restart the game
+        function restartGame() {
+            initGame();
+        }
+
+        // Resume the game
+        function resumeGame() {
+            pauseMenu.style.display = 'none';
+            isPaused = false;
+            gameLoop = setInterval(drawGame, gameSpeed);
+        }
+
+        // Open settings menu
+        function openSettings() {
+            pauseMenu.style.display = 'none';
+            settingsMenu.style.display = 'flex';
+        }
+
+        // Save settings and apply the selected speed
+        function saveSettings() {
+            gameSpeed = 100 / parseInt(gameSpeedSelect.value);
+            settingsMenu.style.display = 'none'; // Close settings menu
+            resumeGame(); // Restart the game immediately with new speed
+        }
+
+        // Go Back Button
+        function goBack() {
+            window.location.href = "https://aztozmine.github.io/Snekkk/";
+        }
+
+        // Start the game
+        initGame();
     </script>
 </body>
 </html>
